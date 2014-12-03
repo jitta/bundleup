@@ -187,6 +187,7 @@ class Bundle
           #console.log filepath
           # Add the bundle file
           @addFile(filepath, namespace)
+          console.log 'created ' + "/#{@defaultCompiledDir}/bundle/#{prefix}#{namespace}#{@fileExtension}"
 
         fnCompileDone()
       #console.log files
@@ -207,7 +208,7 @@ class Bundle
     #   compileBundle(bundle, files, cb)
 
     # Only add the bundle files
-
+ 
     if @options.use_cache is 'true' or @options.use_cache is true
       ignore = (bundle) ->
         #console.log bundle
@@ -215,6 +216,7 @@ class Bundle
         filepath = "#{@options.staticRoot}/#{@defaultCompiledDir}/bundle/#{prefix}#{bundle}#{@fileExtension}"
         #console.log filepath
         @addFile(filepath, bundle)
+        console.log 'using cache for ' + "/#{@defaultCompiledDir}/bundle/#{prefix}#{bundle}#{@fileExtension}"
 
       bundles.forEach ignore.bind(@)
 
