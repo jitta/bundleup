@@ -81,7 +81,6 @@ class Bundle
     for file in foundFiles
       @addFile(file, namespace)
 
-
   addFile:(file, namespace=@defaultNamespace) =>
     file = path.normalize(file)
 
@@ -115,6 +114,7 @@ class Bundle
       needsCompiling: needsCompiling
       namespace: namespace
 
+
   addUrl:(url, namespace=@defaultNamespace) =>
     @_addUrl(url, namespace, true)
 
@@ -145,7 +145,7 @@ class Bundle
       specialFiles = []
 
       files = files.filter((file) -> file.namespace == namespace)
-
+      #console.log files
       fileIterator = (file, cb) =>
         if typeof file.url == "object" or typeof file.url == "boolean"
           specialFiles.push(file.file)
@@ -162,8 +162,9 @@ class Bundle
         results = results.filter((o) -> typeof(o) != "undefined")
         str     = results.join(if @fileExtension is '.css' then '\n' else ';\n')
 
-        hash     = crypto.createHash('md5').update(str).digest('hex')
-        filepath = "#{@options.staticRoot}/#{@defaultCompiledDir}/bundle/#{hash.substring(0, 7)}_#{namespace}#{@fileExtension}"
+        prefix = if @options.hashFileName then crypto.createHash('md5').update(str).digest('hex') else @options.filePrefix
+
+        filepath = "#{@options.staticRoot}/#{@defaultCompiledDir}/bundle/#{prefix}#{namespace}#{@fileExtension}"
 
         # Then add the special files (urls & objects)
 
@@ -183,17 +184,18 @@ class Bundle
             str  = @minify(str)
 
             writeToFile(filepath, str)
-
+          #console.log filepath
           # Add the bundle file
           @addFile(filepath, namespace)
 
         fnCompileDone()
-
+      #console.log files
       async.map(files, fileIterator, complete)
 
 
     # Find all bundles name
     bundles = []
+
     for file in @files
       bundles.push file.namespace unless file.namespace in bundles
 
@@ -205,7 +207,19 @@ class Bundle
     #   compileBundle(bundle, files, cb)
 
     # Only add the bundle files
-    async.forEach(bundles, compileBundle.bind(@, files), fnToBundleDone)
+
+    if @options.use_cache is 'true' or @options.use_cache is true
+      ignore = (bundle) ->
+        #console.log bundle
+        prefix = if @options.hashFileName then crypto.createHash('md5').update(bundle).digest('hex') else @options.filePrefix
+        filepath = "#{@options.staticRoot}/#{@defaultCompiledDir}/bundle/#{prefix}#{bundle}#{@fileExtension}"
+        #console.log filepath
+        @addFile(filepath, bundle)
+
+      bundles.forEach ignore.bind(@)
+
+    else
+      async.forEach(bundles, compileBundle.bind(@, files), fnToBundleDone)
 
   _compile: (file, writeTo, cb) =>
 

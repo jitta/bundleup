@@ -19,6 +19,11 @@ class BundleUp
     options.minifyJs = options.minifyJs || false
     options.complete = options.complete || ->
 
+    options.hashFileName = if options.hashFileName then true else false
+    options.filePrefix = if options.filePrefix isnt '' then options.filePrefix else ''
+
+    options.use_cache = options.use_cache
+
     @app = app
     @js = new Js(options)
     @css = new Css(options)
@@ -31,10 +36,15 @@ class BundleUp
       throw new Error("Unsupported asset type")
 
     if options.bundle
+      if options.use_cache is 'true' or options.use_cache is true
+        console.log 'bundle up is using cache'
+      else
+        console.log 'bundle up is building files'
       done = _.after(2, options.complete)
       @js.toBundles(done)
       @css.toBundles(done)
     else
+      console.log 'bundle up on development mode'
       # Compile files on-the-fly when not bundled
       @app.use (new OnTheFlyCompiler(@js, @css, options.compilers)).middleware
       options.complete()

@@ -4,6 +4,7 @@ Bundle   = require './bundle'
 fs       = require 'fs'
 os       = require 'os'
 path     = require 'path'
+crypto   = require 'crypto'
 
 class Css extends Bundle
   constructor: (@options) ->
@@ -29,8 +30,12 @@ class Css extends Bundle
     style = ''
     for file in @files
       if file.namespace == namespace
+        if @options.bundle
+          hash = '?' + crypto.createHash('md5').update(Math.random().toString()).digest('hex')
+        else
+          hash = ''
         url = if typeof file.url == 'boolean' then file.file else file.url
-        style += "<link href='#{url}' rel='stylesheet' type='text/css'/>"
+        style += "<link href='#{url}#{hash.substring(0, 7)}' rel='stylesheet' type='text/css'/>"
     return style
 
   _convertFilename: (filename) ->
