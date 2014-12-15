@@ -1,0 +1,6 @@
+.DS_Store
+*.sublime*
+npm-debug.log
+node_modules/
+temp/
+test/files/
