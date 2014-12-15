@@ -37,9 +37,9 @@ class BundleUp
 
     if options.bundle
       if options.use_cache is 'true' or options.use_cache is true
-        console.log 'bundle up is using cache'
+        console.log 'bundle up is using cache' if options.verbose is true
       else
-        console.log 'bundle up is building files'
+        console.log 'bundle up is building files' if options.verbose is true
       done = _.after(2, options.complete)
       @js.toBundles(done)
       @css.toBundles(done)
