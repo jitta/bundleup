@@ -30,8 +30,12 @@ class Css extends Bundle
     style = ''
     for file in @files
       if file.namespace == namespace
+        try
+          contents = fs.readFileSync file.file, "utf8"
+        catch error
+          contents = ""
         if @options.bundle
-          hash = '?' + crypto.createHash('md5').update(Math.random().toString()).digest('hex')
+          hash = '?' + crypto.createHash('sha256').update(contents).digest('hex')
         else
           hash = ''
         url = if typeof file.url == 'boolean' then file.file else file.url

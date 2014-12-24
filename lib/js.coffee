@@ -2,6 +2,7 @@ Bundle   = require './bundle'
 UglifyJS = require 'uglify-js'
 _        = require 'lodash'
 crypto   = require 'crypto'
+fs       = require 'fs'
 
 class Js extends Bundle
   constructor: (@options) ->
@@ -23,10 +24,13 @@ class Js extends Bundle
 
     for file in @files
       if file.namespace == namespace
-
+        try
+          contents = fs.readFileSync file.file, "utf8"
+        catch error
+          contents = ""
         if typeof file.url == "string" # added or .addJsFile
           if @options.bundle
-            hash = '?' + crypto.createHash('md5').update(Math.random().toString()).digest('hex')
+            hash = '?' + crypto.createHash('sha256').update(contents).digest('hex')
           else
             hash = ''
           js += "<script src='#{file.url}#{hash.substring(0, 7)}' type='text/javascript'" + (if @options.asyncJs == true then " async" else "") + "></script>"
