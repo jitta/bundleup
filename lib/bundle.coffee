@@ -17,12 +17,14 @@ class Bundle
   # the path returned is relative to the
   # root of the application
   _getRelativePath: (file) =>
+    pathOffset = -1
     relativePath = ''
     for char, i in file
+      pathOffset = i if char is '/'
       if @options.staticRoot[i] == file[i]
         continue
       else
-        relativePath = file.substring(i)
+        relativePath = file.substring(pathOffset)
         break
     return relativePath
 
