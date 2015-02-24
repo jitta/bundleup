@@ -1,4 +1,5 @@
 fs = require 'fs'
+autoprefixer = require 'autoprefixer-stylus'
 
 exports.compile = compile = (compilers, content, file, cb) ->
   fileExt = file.split('.')
