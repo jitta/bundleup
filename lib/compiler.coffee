@@ -13,7 +13,8 @@ exports.compile = compile = (compilers, content, file, cb) ->
         console.log file + ':\n  ' + err.message + "\n"
         return cb(err, err.message)
     when 'styl'
-      compilers.stylus(content, file).use(autoprefixer()).render (err, css) ->
+      autoprefixerOpts = compilers.stylus().options.autoprefixer || {}
+      compilers.stylus(content, file).use(autoprefixer(autoprefixerOpts)).render (err, css) ->
         if err?
           console.log err.message
           css = err.message
